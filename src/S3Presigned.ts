@@ -24,6 +24,17 @@ export class S3Presigned {
 
 		const result = s3.createPresignedPost(presignedParam)
 		return result
-
 	}
+
+	async getSignedUrl(key: string, originFileName: string, expirationSecond?: number) {
+		const s3 = new AWS.S3({ region: this.region })
+		const fileExt = key.length > 1 ? key.split(".")[key.split(".").length - 1] : ""
+		const params = { Bucket: this.bucket,
+						Key: key,
+						Expires: Number(expirationSecond) || 3600,
+						ResponseContentDisposition: `inline; filename=\"${encodeURI(originFileName)}.${fileExt}\"`
+					}
+		return s3.getSignedUrl("getObject", params)
+	}
+
 }
